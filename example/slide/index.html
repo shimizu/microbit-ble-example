@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<script src="http://localhost:8124/socket.io/socket.io.js"></script>
+<title>スライド：chibi:bit BLE</title>
+
+
+<style>
+	.reveal,
+	.reveal h1,
+	.reveal h2,
+	.reveal h3,
+	.reveal h4,
+	.reveal h5,
+	.reveal h6 {
+		text-transform: none !important;
+		font-family:  "Hiragino Kaku Gothic ProN","メイリオ", "Helvetica Neue", Helvetica, sans-serif !important;
+	}
+	
+	
+	.reveal blockquote {
+		padding: 0.5em !important;
+		text-align: left !important;
+		letter-spacing: 0.05em !important;
+		font-feature-settings: 'palt' 1 !important;
+		font-size: 0.9em !important;
+		font-style:normal !important;
+	}
+
+	.reveal blockquote .from {
+		font-size: 0.8em !important;
+		font-style: italic !important;
+		text-align: right !important;
+	}
+
+	
+</style>
+
+<link rel="stylesheet" href="http://localhost:8000/css/reveal.css">
+<link rel="stylesheet" href="http://localhost:8000/css/theme/black.css">
+
+<!-- Theme used for syntax highlighting of code -->
+<link rel="stylesheet" href="http://localhost:8000/lib/css/zenburn.css">
+
+
+</head>
+
+
+<body>
+	<div class="reveal">
+		<div class="slides">
+				<section>
+					<h1>Chibi:bitとBLE</h1>
+					<h3>繋げて遊ぼう！</h3>
+					<p>
+						<small>Created by <a href="http://shimz.me">Masayuki Shiizu</a> / <a href="http://twitter.com/_shimizu">@_shimizu</a></small>
+					</p>
+				</section>
+
+				<section data-background="http://localhost:8000/img/microbit.jpg">
+					<h2>Bluetooth Low Energy</h2>
+				</section>
+
+
+
+				<section>
+					<h2>BLEとは？</h2>
+					<blockquote>
+近距離無線通信技術Bluetoothの拡張仕様の一つで、極低電力で通信が可能なもの。2010年7月に発表されたBluetooth 4.0規格の一部として策定された。<br>対応チップは従来の1/3程度の電力で動作することができ、ボタン電池一つで数年稼働することができるとされている。
+					<!--<div class="from"></div>-->
+					</blockquote>
+				</section>
+								
+				<section>
+					<h3>
+						Chibi:bitはBLEモジュールを搭載しているので、BLEを通じてパソコンやRaspberry Piと繋げて遊べます。
+					</h3>
+				</section>
+				
+				<section>
+					<h2>node-bbc-microbit</h2>
+					<p>A Node.js BLE (Bluetooth Low Energy) central module</p>
+					<pre><code class="hljs" data-trim contenteditable>npm noble 
+npm install bbc-microbit					</code></pre>
+				</section>
+
+
+				<section>
+					<h2>スキャン</h2>
+					<pre><code class="hljs" data-trim contenteditable>var BBCMicrobit = require('bbc-microbit')
+
+//BLEスキャン開始
+BBCMicrobit.discover(function(microbit) {
+
+	microbit.on('disconnect', function() {
+		//接続エラー	  
+		process.exit(0)
+	})
+
+	microbit.connectAndSetUp(function() {
+		//接続成功
+		console.log('chibi:bitに接続しました')
+	})
+  
+})
+					</code></pre>
+				</section>	
+				
+				<section>
+					<h2>ボタン操作を取得</h2>
+					<pre><code class="hljs" data-trim contenteditable>var BBCMicrobit = require('bbc-microbit')
+var BUTTON_VALUE_MAPPER = ['Not Pressed', 'Pressed', 'Long Press'];
+
+
+console.log('chibi:bitを検索しています')
+BBCMicrobit.discover(function(microbit) {
+	console.log('chibi:bitを発見しました: id = %s, address = %s', microbit.id, microbit.address)
+
+	microbit.on('disconnect', function() {
+		console.log('エラー！：接続できませんでした')
+		process.exit(0)
+	})
+
+	microbit.connectAndSetUp(function() {
+		console.log('chibi:bitに接続しました')
+	
+		microbit.subscribeButtons(function() {
+			console.log('ボタン入力を受付中')
+		})
+	})
+  
+  
+	microbit.on('buttonAChange', function(value) {
+		console.log('Ａボタン: ', BUTTON_VALUE_MAPPER[value])
+	})
+
+	microbit.on('buttonBChange', function(value) {
+		console.log('Ｂボタン: ', BUTTON_VALUE_MAPPER[value])
+	})
+
+})
+					</code></pre>
+				</section>				
+
+				<section>
+					<h2>メッセージ送信</h2>
+					<pre><code class="hljs" data-trim contenteditable>var BBCMicrobit = require('bbc-microbit')
+var text = (process.argv[2]) ?  process.argv[2] :'Hello there' ;
+
+
+console.log('chibi:bitを検索しています')
+BBCMicrobit.discover(function(microbit) {
+	console.log('\tchibi:bitを発見しました: id = %s, address = %s', microbit.id, microbit.address)
+
+    microbit.on('disconnect', function() {
+		console.log('\t接続エラー！：chibi:bitに接続できませんでした')
+        process.exit(0)
+    })
+
+    microbit.connectAndSetUp(function() {
+        console.log('\t接続しました')
+
+        microbit.writeLedText(text, function() {
+            console.log('テキスト送信： "%s"', text)            
+            process.exit(0)
+        })
+	})
+})
+
+					</code></pre>
+				</section>				
+				
+				
+		</div>
+	</div>
+
+	<script src="http://localhost:8000/lib/js/head.min.js"></script>
+	<script src="http://localhost:8000/js/reveal.js"></script>
+
+	<script>
+		// 初期設定
+		Reveal.initialize({
+			history: true,
+		});
+		
+		
+		var socket = io.connect('localhost:8124');
+        socket.on('greeting', function(data, fn) {
+			switch(data.message){
+				case "A button":
+					Reveal.prev()
+					break;
+				case "B button":
+					Reveal.next()
+					break;
+				
+			}
+        })
+
+	</script>
+</body>
+
+
+
+</html>
