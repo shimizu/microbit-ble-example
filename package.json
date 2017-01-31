@@ -1,5 +1,5 @@
 {
-  "name": "mirco:bit BLE example",
+  "name": "mircobit_BLE_example",
   "version": "1.0.0",
   "description": "microbit BLE example",
   "main": "index.js",
