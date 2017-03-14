@@ -51,6 +51,7 @@ var onClickButtons = function(microbit){
     })    
 }
 
+//ipアドレスを取得する
 function getLocalAddress() {
     var ifacesObj = {}
     ifacesObj.ipv4 = []
